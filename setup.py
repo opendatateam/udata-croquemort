@@ -86,7 +86,7 @@ tests_require = []
 
 setup(
     name='udata-croquemort',
-    version='0.0.1.dev',
+    version='0.0.1',
     description='Croquemort support for uData',
     long_description=long_description,
     url='https://github.com/opendatateam/udata-croquemort',
