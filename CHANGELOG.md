@@ -1,6 +1,6 @@
 # Changelog
 
-## Current (in progress)
+## 1.0.1 (2017-10-20)
 
 - Fix setup.py version
 
