@@ -2,7 +2,7 @@
 
 ## Current (in progress)
 
-- Nothing yet
+- Fix setup.py version
 
 ## 1.0.0 (2017-10-20)
 
