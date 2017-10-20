@@ -5,5 +5,5 @@ uData
 '''
 from __future__ import unicode_literals
 
-__version__ = '0.0.2.dev'
+__version__ = '1.0.0.dev'
 __description__ = 'uData Croquemort integration'
