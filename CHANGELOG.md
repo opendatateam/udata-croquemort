@@ -2,7 +2,7 @@
 
 ## Current (in progress)
 
-- Nothing yet
+- Stable version
 
 ## 0.0.1 (2017-10-03)
 
