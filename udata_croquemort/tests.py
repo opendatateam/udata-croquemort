@@ -61,7 +61,7 @@ def exception_factory(exception):
 
 class CheckUrlSettings(Testing):
     CROQUEMORT_URL = CROQUEMORT_TEST_URL
-    CROQUEMORT_NB_RETRY = 2
+    CROQUEMORT_NB_RETRY = 3
     CROQUEMORT_DELAY = 1
 
 
@@ -159,6 +159,30 @@ class UdataCroquemortTest(TestCase):
                                content_type='text/html')
         res = self.checker.check(self.resource)
         self.assertIsNone(res)
+
+    @httpretty.activate
+    def test_retry(self):
+        '''Test the `is_pending` logic from utils.check_url'''
+        url = self.resource.url
+        url_hash = faker.md5()
+        httpretty.register_uri(httpretty.POST, CHECK_ONE_URL,
+                               body=json.dumps({'url-hash': url_hash}),
+                               content_type='application/json')
+        check_url = '/'.join((METADATA_URL, url_hash))
+
+        def make_response(status, body=None):
+            return httpretty.Response(body=body or metadata_factory(url),
+                                      content_type='application/json',
+                                      status=status)
+
+        httpretty.register_uri(httpretty.GET, check_url,
+                               responses=[
+                                   make_response(500),
+                                   make_response(404, body=''),
+                                   make_response(200)
+                               ])
+        res = self.checker.check(self.resource)
+        self.assertEquals(res['check:status'], 200)
 
 
 class UdataNoCroquemortConfiguredTest(UdataCroquemortTest):
