@@ -2,7 +2,7 @@
 
 ## Current (in progress)
 
-- Nothing yet
+- Switch to pytest
 
 ## 1.0.1 (2017-10-20)
 

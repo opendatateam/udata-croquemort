@@ -2,7 +2,7 @@
 version: 2
 
 jobs:
-  python:
+  build:
     docker:
       - image: udata/circleci
       - image: mongo:3.2
@@ -28,9 +28,7 @@ jobs:
           command: |
             virtualenv venv
             source venv/bin/activate
-            pip install -U --pre udata[test]
-            pip install -e . || pip install -e .
-            pip install -r requirements/circleci.pip
+            pip install -r requirements/develop.pip || pip install -r requirements/develop.pip
       - save_cache:
           key: py-cache-{{ checksum "python.deps" }}
           paths:
@@ -42,40 +40,26 @@ jobs:
       - run:
           name: Run tests
           command: |
-            mkdir -p reports/python
             source venv/bin/activate
-            nosetests --with-xunit --xunit-file=reports/python/tests.xml  udata_croquemort
+            inv qa test --report
       - store_test_results:
-          path: reports/python
+          path: reports/
       - store_artifacts:
           path: reports/
           destination: reports
-
-      - persist_to_workspace:
-          root: .
-          paths:
-          - venv
-
-  dist:
-    docker:
-      - image: udata/circleci
-    environment:
-       BASH_ENV: /root/.bashrc
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
       - run:
           name: Build a distributable package
           command: |
             source venv/bin/activate
-            if [[ $CIRCLE_TAG ]]; then inv pydist; else inv pydist -b $CIRCLE_BUILD_NUM; fi
+            # Build a wheel release
+            if [[ $CIRCLE_TAG ]]; then inv dist; else inv dist -b $CIRCLE_BUILD_NUM; fi
       - store_artifacts:
           path: dist
       - persist_to_workspace:
           root: .
           paths:
             - dist
+            - venv
 
   publish:
     docker:
@@ -90,28 +74,41 @@ jobs:
           name: Publish on PyPI
           command: twine upload --username "${PYPI_USERNAME}" --password "${PYPI_PASSWORD}" dist/*.whl
 
+  github:
+    docker:
+      - image: udata/circleci
+    environment:
+       BASH_ENV: /root/.bashrc
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Upload github release
+          command: gh_release
+
 workflows:
   version: 2
   build:
     jobs:
-      - python:
-          filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
-      - dist:
-          requires:
-            - python
+      - build:
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
       - publish:
           requires:
-            - dist
+            - build
           filters:
             branches:
-              only:
-                - master
-                - /v[0-9]+(\.[0-9]+)*/
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+          context: org-global
+      - github:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
           context: org-global
