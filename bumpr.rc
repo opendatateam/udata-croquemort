@@ -6,7 +6,7 @@ tag = true
 tag_format = v{version}
 push = true
 clean = inv clean
-tests = inv test
+tests = inv qa test
 publish = inv pydist
 files =
     README.md

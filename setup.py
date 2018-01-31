@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import io
+import os
 import re
 
 from setuptools import setup, find_packages
@@ -32,7 +34,7 @@ def md2pypi(filename):
      - code-block directive
      - travis ci build badges
     '''
-    content = open(filename).read()
+    content = io.open(filename).read()
 
     for match in RE_MD_CODE_BLOCK.finditer(content):
         rst_block = '\n'.join(
@@ -74,15 +76,26 @@ def md2pypi(filename):
     return content
 
 
+def pip(filename):
+    '''Parse pip reqs file and transform it to setuptools requirements.'''
+    requirements = []
+    for line in open(os.path.join('requirements', filename)):
+        line = line.strip()
+        if not line or '://' in line or line.startswith('#'):
+            continue
+        requirements.append(line)
+    return requirements
+
+
 long_description = '\n'.join((
     md2pypi('README.md'),
     md2pypi('CHANGELOG.md'),
     ''
 ))
 
+install_requires = pip('install.pip')
+tests_require = pip('test.pip')
 
-install_requires = []
-tests_require = []
 
 setup(
     name='udata-croquemort',
@@ -96,6 +109,9 @@ setup(
     include_package_data=True,
     install_requires=install_requires,
     tests_require=tests_require,
+    extras_require={
+        'test': tests_require,
+    },
     entry_points={
         'udata.linkcheckers': [
             "croquemort=udata_croquemort.checker:CroquemortLinkChecker",
