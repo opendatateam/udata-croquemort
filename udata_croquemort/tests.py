@@ -4,11 +4,10 @@ from __future__ import unicode_literals
 import json
 from datetime import datetime
 
-import httpretty
+import pytest
 import requests
 
 # import this first or hell will break loose
-from udata.tests import TestCase
 from udata.core.dataset.factories import DatasetFactory, ResourceFactory
 from udata.settings import Testing
 from udata.utils import faker
@@ -41,7 +40,7 @@ def metadata_factory(url, data=None):
     return json.dumps(response)
 
 
-def mock_url_check(url, data=None, status=200):
+def mock_url_check(httpretty, url, data=None, status=200):
     url_hash = faker.md5()
     httpretty.register_uri(httpretty.POST, CHECK_ONE_URL,
                            body=json.dumps({'url-hash': url_hash}),
@@ -65,17 +64,16 @@ class CheckUrlSettings(Testing):
     CROQUEMORT_DELAY = 1
 
 
-class UdataCroquemortTest(TestCase):
+class UdataCroquemortTest:
     settings = CheckUrlSettings
 
-    def setUp(self):
-        super(UdataCroquemortTest, self).setUp()
+    @pytest.fixture(autouse=True)
+    def setup(self, app):
         self.resource = ResourceFactory()
         self.dataset = DatasetFactory(resources=[self.resource])
         self.checker = CroquemortLinkChecker()
 
-    @httpretty.activate
-    def test_returned_metadata(self):
+    def test_returned_metadata(self, httpretty):
         url = self.resource.url
         test_cases = [
             {'status': 200, 'available': True},
@@ -89,15 +87,14 @@ class UdataCroquemortTest(TestCase):
         }
         for test_case in test_cases:
             metadata['final-status-code'] = test_case['status']
-            mock_url_check(url, metadata)
+            mock_url_check(httpretty, url, metadata)
             res = self.checker.check(self.resource)
-            self.assertEquals(res['check:url'], url)
-            self.assertEquals(res['check:status'], test_case['status'])
-            self.assertEquals(res['check:available'], test_case['available'])
-            self.assertIsInstance(res['check:date'], datetime)
+            assert res['check:url'] == url
+            assert res['check:status'] == test_case['status']
+            assert res['check:available'] == test_case['available']
+            assert isinstance(res['check:date'], datetime)
 
-    @httpretty.activate
-    def test_post_request(self):
+    def test_post_request(self, httpretty):
         url = self.resource.url
         url_hash = faker.md5()
         httpretty.register_uri(httpretty.POST, CHECK_ONE_URL,
@@ -109,46 +106,41 @@ class UdataCroquemortTest(TestCase):
                                content_type='application/json',
                                status=200)
         self.checker.check(self.resource)
-        self.assertTrue(len(httpretty.core.httpretty.latest_requests))
+        assert len(httpretty.core.httpretty.latest_requests)
         post_request = httpretty.core.httpretty.latest_requests[0]
-        self.assertEquals(json.loads(post_request.body), {
+        assert json.loads(post_request.body) == {
             'url': self.resource.url,
             'group': self.dataset.slug
-        })
+        }
 
-    @httpretty.activate
-    def test_delayed_url(self):
+    def test_delayed_url(self, httpretty):
         url = faker.uri()
-        mock_url_check(url, status=404)
+        mock_url_check(httpretty, url, status=404)
         res = self.checker.check(self.resource)
-        self.assertIsNone(res)
+        assert res is None
 
-    @httpretty.activate
-    def test_timeout(self):
+    def test_timeout(self, httpretty):
         exception = requests.Timeout('Request timed out')
         httpretty.register_uri(httpretty.POST, CHECK_ONE_URL,
                                body=exception_factory(exception))
         res = self.checker.check(self.resource)
-        self.assertIsNone(res)
+        assert res is None
 
-    @httpretty.activate
-    def test_connection_error(self):
+    def test_connection_error(self, httpretty):
         exception = requests.ConnectionError('Unable to connect')
         httpretty.register_uri(httpretty.POST, CHECK_ONE_URL,
                                body=exception_factory(exception))
         res = self.checker.check(self.resource)
-        self.assertIsNone(res)
+        assert res is None
 
-    @httpretty.activate
-    def test_json_error_check_one(self):
+    def test_json_error_check_one(self, httpretty):
         httpretty.register_uri(httpretty.POST, CHECK_ONE_URL,
                                body='<strong>not json</strong>',
                                content_type='text/html')
         res = self.checker.check(self.resource)
-        self.assertIsNone(res)
+        assert res is None
 
-    @httpretty.activate
-    def test_json_error_check_url(self):
+    def test_json_error_check_url(self, httpretty):
         url_hash = faker.md5()
         httpretty.register_uri(httpretty.POST, CHECK_ONE_URL,
                                body=json.dumps({'url-hash': url_hash}),
@@ -158,10 +150,9 @@ class UdataCroquemortTest(TestCase):
                                body='<strong>not json</strong>',
                                content_type='text/html')
         res = self.checker.check(self.resource)
-        self.assertIsNone(res)
+        assert res is None
 
-    @httpretty.activate
-    def test_retry(self):
+    def test_retry(self, httpretty):
         '''Test the `is_pending` logic from utils.check_url'''
         url = self.resource.url
         url_hash = faker.md5()
@@ -182,15 +173,12 @@ class UdataCroquemortTest(TestCase):
                                    make_response(200)
                                ])
         res = self.checker.check(self.resource)
-        self.assertEquals(res['check:status'], 200)
+        assert res['check:status'], 200
 
 
-class UdataNoCroquemortConfiguredTest(UdataCroquemortTest):
+class NoCroquemortConfiguredTest:
+    def test_croquemort_not_configured(self, app):
+        dataset = DatasetFactory(visible=True)
+        checker = CroquemortLinkChecker()
 
-    def __init__(self, *args, **kwargs):
-        super(UdataNoCroquemortConfiguredTest, self).__init__(*args, **kwargs)
-        self.settings.CROQUEMORT = None
-
-    def test_croquemort_not_configured(self):
-        res = self.checker.check(self.resource)
-        self.assertIsNone(res)
+        assert checker.check(dataset.resources[0]) is None
