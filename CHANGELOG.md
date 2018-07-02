@@ -2,7 +2,7 @@
 
 ## Current (in progress)
 
-- Nothing yet
+- Migrate to python3 🐍 [#28](https://github.com/opendatateam/udata-croquemort/pull/28)
 
 ## 1.0.2 (2018-03-13)
 
