@@ -1,4 +1,4 @@
-import httplib
+from http import client as httplib
 import json
 import logging
 import time
