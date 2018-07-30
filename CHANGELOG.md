@@ -1,5 +1,9 @@
 # Changelog
 
+## Current (in progress)
+
+- Nothing yet
+
 ## 1.0.3 (2018-07-30)
 
 - Handle croquemort response w/o updated attr [#31](https://github.com/opendatateam/udata-croquemort/pull/31)
