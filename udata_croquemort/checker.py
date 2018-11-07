@@ -18,14 +18,18 @@ class CroquemortLinkChecker(object):
         status = response.get('final-status-code')
         try:
             status = int(status)
+        except ValueError:
+            return {'check:error': 'Malformed check response'}
+        else:
+            check_date = response.get('updated')
+            if check_date:
+                check_date = dateutil.parser.parse(response.get('updated'))
             return {
                 'check:url': response.get('checked-url'),
                 'check:status': status,
-                'check:date': dateutil.parser.parse(response.get('updated')),
-                'check:available': status and status >= 200 and status < 400
+                'check:available': status and status >= 200 and status < 400,
+                'check:date': check_date,
             }
-        except ValueError:
-            return {'check:error': 'Malformed check response'}
 
     def check(self, resource):
         """
