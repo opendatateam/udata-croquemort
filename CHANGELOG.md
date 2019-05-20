@@ -1,5 +1,9 @@
 # Changelog
 
+## Current (in progress)
+
+- Nothing yet
+
 ## 1.0.4 (2019-05-20)
 
 - Do not check FTP(S) urls [#86](https://github.com/opendatateam/udata-croquemort/pull/86)
