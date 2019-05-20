@@ -65,7 +65,7 @@ class CroquemortLinkChecker(object):
             return {'check:error': message}
         try:
             # do not check ftp(s) urls
-            if resource.url.startswith('ftp'):
+            if resource.url and resource.url.lower().startswith('ftp'):
                 return
             check_response = check_url(resource.url, group=dataset.slug)
             return self._format_response(check_response)
