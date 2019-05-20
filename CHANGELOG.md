@@ -2,7 +2,7 @@
 
 ## Current (in progress)
 
-- Nothing yet
+- Do not check FTP(S) urls [#86](https://github.com/opendatateam/udata-croquemort/pull/86)
 
 ## 1.0.3 (2018-07-30)
 
