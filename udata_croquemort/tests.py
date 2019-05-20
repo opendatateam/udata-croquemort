@@ -186,6 +186,12 @@ class UdataCroquemortTest:
         res = self.checker.check(self.resource)
         assert res['check:status'], 200
 
+    def test_ftp_url(self, httpretty):
+        resource = ResourceFactory(url='ftp://etalab.gouv.fr')
+        DatasetFactory(resources=[resource])
+        res = self.checker.check(resource)
+        assert res is None
+
 
 class NoCroquemortConfiguredTest:
     def test_croquemort_not_configured(self, app):

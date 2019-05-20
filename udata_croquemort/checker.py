@@ -64,8 +64,11 @@ class CroquemortLinkChecker(object):
             log.error(message)
             return {'check:error': message}
         try:
+            # do not check ftp(s) urls
+            if resource.url.startswith('ftp'):
+                return
             check_response = check_url(resource.url, group=dataset.slug)
             return self._format_response(check_response)
         except UnreachableLinkChecker as e:
             log.error('Unreachable croquemort for url %s: %s', resource.url, e)
-            return None
+            return
