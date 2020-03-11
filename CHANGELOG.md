@@ -1,5 +1,9 @@
 # Changelog
 
+## Current (in progress)
+
+- Nothing yet
+
 ## 2.0.0 (2020-03-11)
 
 - Migrate to python3 🐍 [#93](https://github.com/opendatateam/udata-croquemort/pull/93)
