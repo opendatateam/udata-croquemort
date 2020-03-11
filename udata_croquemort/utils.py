@@ -1,4 +1,4 @@
-import httplib
+from http import client as httplib
 import json
 import logging
 import time
@@ -74,7 +74,7 @@ def check_url(url, group=None):
             response = requests.get(retrieve_url, timeout=TIMEOUT)
         except requests.Timeout:
             raise UnreachableLinkChecker(TIMEOUT_LOG_MSG)
-        except requests.RequestException:
+        except requests.RequestException as e:
             log.error(ERROR_LOG_MSG, exc_info=True)
             raise UnreachableLinkChecker('{}: {}'.format(ERROR_LOG_MSG, e))
         time.sleep(delay)
