@@ -80,7 +80,9 @@ class UdataCroquemortTest:
             {'status': 503, 'available': False},
         ]
         metadata = {
-            'content-type': 'text/html; charset=utf-8',
+            'content-type': 'text/html',
+            'content-length': '2512124',
+            'charset': 'utf-8'
         }
         for test_case in test_cases:
             metadata['final-status-code'] = test_case['status']
@@ -90,11 +92,14 @@ class UdataCroquemortTest:
             assert res['check:status'] == test_case['status']
             assert res['check:available'] == test_case['available']
             assert isinstance(res['check:date'], datetime)
+            assert res['metadata:content-type'] == 'text/html'
+            assert res['metadata:content-length'] == '2512124'
+            assert res['metadata:charset'] == 'utf-8'
 
     def test_returned_metadata_w_missing_updated(self, httpretty):
         url = self.resource.url
         metadata = {
-            'content-type': 'text/html; charset=utf-8',
+            'content-type': 'text/html',
             'final-status-code': 200,
             'available': True
         }

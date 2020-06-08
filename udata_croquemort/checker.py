@@ -24,12 +24,20 @@ class CroquemortLinkChecker(object):
             check_date = response.get('updated')
             if check_date:
                 check_date = dateutil.parser.parse(response.get('updated'))
-            return {
+
+            result = {
                 'check:url': response.get('checked-url'),
                 'check:status': status,
                 'check:available': status and status >= 200 and status < 400,
                 'check:date': check_date,
             }
+
+            for header in [
+                'content-type', 'content-length', 'content-md5', 'charset'
+            ]:
+                result[f"metadata:{header}"] = response.get(header)
+
+            return result
 
     def check(self, resource):
         """
