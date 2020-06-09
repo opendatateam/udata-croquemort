@@ -35,7 +35,7 @@ class CroquemortLinkChecker(object):
             for header in [
                 'content-type', 'content-length', 'content-md5', 'charset'
             ]:
-                result[f"metadata:{header}"] = response.get(header)
+                result[f"check-headers:{header}"] = response.get(header)
 
             return result
 

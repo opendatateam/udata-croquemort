@@ -92,9 +92,9 @@ class UdataCroquemortTest:
             assert res['check:status'] == test_case['status']
             assert res['check:available'] == test_case['available']
             assert isinstance(res['check:date'], datetime)
-            assert res['metadata:content-type'] == 'text/html'
-            assert res['metadata:content-length'] == '2512124'
-            assert res['metadata:charset'] == 'utf-8'
+            assert res['check-headers:content-type'] == 'text/html'
+            assert res['check-headers:content-length'] == '2512124'
+            assert res['check-headers:charset'] == 'utf-8'
 
     def test_returned_metadata_w_missing_updated(self, httpretty):
         url = self.resource.url
