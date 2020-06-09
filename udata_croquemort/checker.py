@@ -54,6 +54,10 @@ class CroquemortLinkChecker(object):
                 'check:status': 200,
                 'check:available': True,
                 'check:date': datetime.datetime(2017, 9, 4, 11, 13, 8, 888288),
+                'content-type': 'text/csv',
+                'content-length': '245436',
+                'content-md5': 'acbd18db4cc2f85cedef654fccc4a4d8',
+                'charset': 'utf-8',
             }
             Or in case of failure (in udata-croquemort, not croquemort):
             {
