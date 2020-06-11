@@ -33,7 +33,8 @@ class CroquemortLinkChecker(object):
             }
 
             for header in [
-                'content-type', 'content-length', 'content-md5', 'charset'
+                'content-type', 'content-length', 'content-md5', 'charset',
+                'content-disposition'
             ]:
                 result[f"check-headers:{header}"] = response.get(header)
 
