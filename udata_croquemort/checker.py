@@ -24,12 +24,21 @@ class CroquemortLinkChecker(object):
             check_date = response.get('updated')
             if check_date:
                 check_date = dateutil.parser.parse(response.get('updated'))
-            return {
+
+            result = {
                 'check:url': response.get('checked-url'),
                 'check:status': status,
                 'check:available': status and status >= 200 and status < 400,
                 'check:date': check_date,
             }
+
+            for header in [
+                'content-type', 'content-length', 'content-md5', 'charset',
+                'content-disposition'
+            ]:
+                result[f"check:headers:{header}"] = response.get(header)
+
+            return result
 
     def check(self, resource):
         """
@@ -42,14 +51,19 @@ class CroquemortLinkChecker(object):
         dict or None
             The formatted response from the linkchecker, like so:
             {
-                'check:url': 'https://example.com',
-                'check:status': 200,
-                'check:available': True,
-                'check:date': datetime.datetime(2017, 9, 4, 11, 13, 8, 888288),
+              'check:url': 'https://example.com',
+              'check:status': 200,
+              'check:available': True,
+              'check:date': datetime.datetime(2017, 9, 4, 11, 13, 8, 888288),
+              'check:headers:content-type': 'text/csv',
+              'check:headers:content-length': '245436',
+              'check:headers:content-md5': 'acbd18db4cc2f85cedef654fccc4a4d8',
+              'check:headers:charset': 'utf-8',
+              'check:headers:content-disposition': 'inline'
             }
             Or in case of failure (in udata-croquemort, not croquemort):
             {
-                'check:error': 'Something went terribly wrong.'
+              'check:error': 'Something went terribly wrong.'
             }
             Or in case of failure in croquemort:
             None
