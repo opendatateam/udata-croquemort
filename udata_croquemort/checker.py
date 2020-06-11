@@ -59,6 +59,7 @@ class CroquemortLinkChecker(object):
               'check:headers:content-length': '245436',
               'check:headers:content-md5': 'acbd18db4cc2f85cedef654fccc4a4d8',
               'check:headers:charset': 'utf-8',
+              'check:headers:content-disposition': 'inline'
             }
             Or in case of failure (in udata-croquemort, not croquemort):
             {
