@@ -36,7 +36,12 @@ class CroquemortLinkChecker(object):
                 'content-type', 'content-length', 'content-md5', 'charset',
                 'content-disposition'
             ]:
-                result[f"check:headers:{header}"] = response.get(header)
+                value = str(response.get(header, '') or '')
+                if len(value) > 0:
+                    try:
+                        result[f"check:headers:{header}"] = int(value)
+                    except ValueError:
+                        result[f"check:headers:{header}"] = value
 
             return result
 
@@ -56,7 +61,7 @@ class CroquemortLinkChecker(object):
               'check:available': True,
               'check:date': datetime.datetime(2017, 9, 4, 11, 13, 8, 888288),
               'check:headers:content-type': 'text/csv',
-              'check:headers:content-length': '245436',
+              'check:headers:content-length': 245436,
               'check:headers:content-md5': 'acbd18db4cc2f85cedef654fccc4a4d8',
               'check:headers:charset': 'utf-8',
               'check:headers:content-disposition': 'inline'
