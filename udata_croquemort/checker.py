@@ -36,7 +36,7 @@ class CroquemortLinkChecker(object):
                 'content-type', 'content-length', 'content-md5', 'charset',
                 'content-disposition'
             ]:
-                value = response.get(header, '')
+                value = str(response.get(header, '') or '')
                 if len(value) > 0:
                     try:
                         result[f"check:headers:{header}"] = int(value)
