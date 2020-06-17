@@ -1,5 +1,9 @@
 # Changelog
 
+## Current (in progress)
+
+- Nothing yet
+
 ## 2.0.1 (2020-06-17)
 
 - Expose new HTTP headers related to content (`content-type`, `content-length`, `charset`, `content-md5`, `content-disposition`) [#133](https://github.com/opendatateam/udata-croquemort/pull/133)
