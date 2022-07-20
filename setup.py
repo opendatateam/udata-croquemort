@@ -74,7 +74,6 @@ setup(
         ]
     },
     license='LGPL',
-    use_2to3=True,
     keywords='udata croquemort',
     classifiers=[
         "Development Status :: 3 - Alpha",
