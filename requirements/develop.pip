@@ -1,4 +1,4 @@
 -e .[test]
 flake8==3.7.4
-invoke==1.2.0
+invoke==1.7.1
 pytest-cov==2.6.1
