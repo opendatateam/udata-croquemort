@@ -1,3 +1,5 @@
+**Note: This project is not maintained anymore. croquemort does not exist anymore. See [hydra](https://github.com/datagouv/hydra) for a udata crawler**
+
 # uData-croquemort
 
 This plugin provides integration between uData and Croquemort link checker.
